@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Heads Up">
+<meta name="theme-color" content="#4b2bd6">
+<title>Heads Up!</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤔</text></svg>">
+<style>
+  :root {
+    --bg: #4b2bd6;
+    --bg2: #7b4bff;
+    --card: #ffffff;
+    --ink: #1c1446;
+    --muted: #6b6490;
+    --good: #19c26b;
+    --pass: #ff9a1f;
+    --accent: #ffd43b;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: linear-gradient(160deg, var(--bg), var(--bg2));
+    color: #fff;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  .screen { position: fixed; inset: 0; display: none; flex-direction: column; }
+  .screen.active { display: flex; }
+  button { font: inherit; cursor: pointer; border: 0; }
+
+  /* Home */
+  #home { overflow-y: auto; padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); }
+  #home .inner { width: 100%; max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 44px; margin: 8px 0 2px; text-align: center; letter-spacing: 1px; }
+  .tagline { text-align: center; opacity: .85; margin: 0 0 18px; }
+  h2 { font-size: 18px; margin: 20px 0 10px; text-transform: uppercase; letter-spacing: 1.5px; opacity: .85; }
+  .players { display: flex; flex-wrap: wrap; gap: 10px; }
+  .player {
+    flex: 1 1 140px; background: rgba(255,255,255,.14); color: #fff; border-radius: 16px;
+    padding: 12px 14px; text-align: left; border: 3px solid transparent;
+  }
+  .player.selected { background: #fff; color: var(--ink); border-color: var(--accent); }
+  .player .name { font-size: 22px; font-weight: 800; }
+  .player .stats { font-size: 13px; opacity: .8; margin-top: 2px; }
+  .player.add { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; font-size: 28px; min-width: 64px; }
+  .cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .cat {
+    background: var(--card); color: var(--ink); border-radius: 20px; padding: 18px 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    box-shadow: 0 6px 0 rgba(0,0,0,.18); transition: transform .08s;
+  }
+  .cat:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,.18); }
+  .cat .icon { font-size: 44px; line-height: 1; }
+  .cat .label { font-size: 19px; font-weight: 800; }
+  .cat .count { font-size: 12px; color: var(--muted); }
+  .how { background: rgba(0,0,0,.18); border-radius: 16px; padding: 12px 16px; font-size: 15px; line-height: 1.5; }
+  .how b { color: var(--accent); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .pill { background: rgba(255,255,255,.18); color: #fff; border-radius: 999px; padding: 10px 16px; font-size: 15px; font-weight: 700; }
+  .pill.on { background: var(--accent); color: var(--ink); }
+  .small-link { background: none; color: #fff; opacity: .6; text-decoration: underline; font-size: 13px; padding: 8px 0; }
+
+  /* Ready / countdown */
+  #ready, #countdown, #timesup { align-items: center; justify-content: center; text-align: center; padding: 24px; }
+  #ready .big { font-size: 34px; font-weight: 800; margin: 12px 0; }
+  #ready .phone { font-size: 80px; }
+  #ready p { opacity: .85; max-width: 520px; }
+  #countdown .num { font-size: 40vmin; font-weight: 900; line-height: 1; }
+  #timesup .big { font-size: 16vmin; font-weight: 900; }
+
+  /* Play */
+  #play { background: var(--card); color: var(--ink); transition: background .15s; }
+  #play.good { background: var(--good); color: #fff; }
+  #play.skip { background: var(--pass); color: #fff; }
+  .hud {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: max(10px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) 0 max(18px, env(safe-area-inset-left));
+    font-size: 5.5vmin; font-weight: 800;
+  }
+  .hud .cat-name { opacity: .5; font-size: 4vmin; }
+  #timer.low { color: #e8363b; }
+  #play.good #timer.low, #play.skip #timer.low { color: #fff; }
+  .word-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 4vw; }
+  #word { font-weight: 900; text-align: center; line-height: 1.05; white-space: nowrap; }
+  .zones { position: absolute; inset: 0; display: flex; }
+  .zones button { flex: 1; background: transparent; }
+  .zone-labels {
+    display: flex; justify-content: space-between;
+    padding: 0 max(18px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+    font-size: 3.4vmin; font-weight: 700; opacity: .45; pointer-events: none;
+  }
+
+  /* Results */
+  #results { overflow-y: auto; padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); }
+  #results .inner { width: 100%; max-width: 640px; margin: 0 auto; text-align: center; }
+  .score-big { font-size: 96px; font-weight: 900; line-height: 1; margin: 8px 0 0; }
+  .score-sub { opacity: .85; margin-bottom: 8px; }
+  .best { display: inline-block; background: var(--accent); color: var(--ink); border-radius: 999px; padding: 4px 14px; font-weight: 800; margin: 6px 0; }
+  .word-list { list-style: none; padding: 0; margin: 16px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; text-align: left; }
+  .word-list li { background: rgba(255,255,255,.14); border-radius: 12px; padding: 10px 12px; font-size: 18px; font-weight: 700; }
+  .word-list li.ok { background: var(--good); }
+  .word-list li.no { background: rgba(0,0,0,.2); opacity: .8; }
+  .btn { background: var(--accent); color: var(--ink); border-radius: 16px; padding: 16px 22px; font-size: 20px; font-weight: 800; box-shadow: 0 5px 0 rgba(0,0,0,.2); }
+  .btn.ghost { background: rgba(255,255,255,.18); color: #fff; }
+  .btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<section id="home" class="screen active">
+  <div class="inner">
+    <h1>🤔 Heads Up!</h1>
+    <p class="tagline">Phone on your forehead. Everyone else gives clues!</p>
+
+    <h2>Who's guessing?</h2>
+    <div class="players" id="players"></div>
+
+    <h2>Pick a category</h2>
+    <div class="cats" id="cats"></div>
+
+    <h2>How to play</h2>
+    <div class="how">
+      Hold the phone <b>sideways on your forehead</b>, screen facing out.<br>
+      Others act, sing or describe the word, but <b>no saying the word!</b><br>
+      Got it? <b>Tilt the phone down</b> ✅ &nbsp; Stuck? <b>Tilt it up</b> to pass ⏭️<br>
+      No tilt? Friends can tap the <b>right side</b> for correct and the <b>left side</b> to pass.
+    </div>
+
+    <div class="row">
+      <button class="pill" id="timeBtn"></button>
+      <button class="pill" id="soundBtn"></button>
+      <button class="pill" id="tiltBtn" hidden>📱 Turn on tilt</button>
+    </div>
+    <button class="small-link" id="resetBtn">Reset scores</button>
+  </div>
+</section>
+
+<!-- READY -->
+<section id="ready" class="screen">
+  <div class="phone">📱</div>
+  <div class="big">Put the phone on your forehead!</div>
+  <p id="readyHint">Hold it sideways with the screen facing your friends.</p>
+</section>
+
+<!-- COUNTDOWN -->
+<section id="countdown" class="screen"><div class="num" id="countNum">3</div></section>
+
+<!-- PLAY -->
+<section id="play" class="screen">
+  <div class="hud">
+    <span id="timer">90</span>
+    <span class="cat-name" id="playCat"></span>
+    <span id="liveScore">0</span>
+  </div>
+  <div class="word-wrap"><div id="word"></div></div>
+  <div class="zone-labels"><span>◀ tap: pass</span><span>tap: correct ▶</span></div>
+  <div class="zones">
+    <button id="tapPass" aria-label="Pass"></button>
+    <button id="tapGood" aria-label="Correct"></button>
+  </div>
+</section>
+
+<!-- TIME'S UP -->
+<section id="timesup" class="screen"><div class="big">⏰ Time's up!</div></section>
+
+<!-- RESULTS -->
+<section id="results" class="screen">
+  <div class="inner">
+    <div id="resPlayer" style="font-size:22px;font-weight:800;margin-top:8px"></div>
+    <div class="score-big" id="resScore">0</div>
+    <div class="score-sub" id="resSub"></div>
+    <div id="resBest"></div>
+    <ul class="word-list" id="resList"></ul>
+    <div class="btns">
+      <button class="btn" id="againBtn">Play again</button>
+      <button class="btn ghost" id="nextBtn"></button>
+      <button class="btn ghost" id="homeBtn">Home</button>
+    </div>
+  </div>
+</section>
+
+<script src="words.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const TIMES = [60, 90, 120];
+  const TILT_ON = 6.5;   // m/s² of gravity along the screen normal (~42° tilt)
+  const TILT_OFF = 3.5;  // back near upright before the next word counts
+
+  // ---------- Saved settings & scores (best effort; works without storage) ----------
+  const store = {
+    get(key, fallback) {
+      try { const v = localStorage.getItem('headsup.' + key); return v ? JSON.parse(v) : fallback; }
+      catch { return fallback; }
+    },
+    set(key, value) {
+      try { localStorage.setItem('headsup.' + key, JSON.stringify(value)); } catch {}
+    }
+  };
+  let players = store.get('players', ['Player 1', 'Player 2']);
+  let scores = store.get('scores', {});          // { name: { total, rounds, best: { category: n } } }
+  let current = store.get('current', players[0]);
+  let roundTime = store.get('time', 90);
+  let soundOn = store.get('sound', true);
+  let decks = store.get('decks', {});            // { category: [remaining words] }
+
+  // ---------- Sound ----------
+  let audio;
+  function unlockAudio() {
+    if (!audio) { try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch {} }
+    if (audio && audio.state === 'suspended') audio.resume();
+  }
+  function beep(freq, start, dur, type = 'sine', vol = 0.25) {
+    if (!soundOn || !audio) return;
+    const t = audio.currentTime + start;
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g).connect(audio.destination);
+    o.start(t); o.stop(t + dur);
+  }
+  const sfx = {
+    good() { beep(880, 0, .12); beep(1320, .1, .22); },
+    pass() { beep(220, 0, .25, 'square', .12); },
+    tick() { beep(1000, 0, .05, 'square', .08); },
+    count() { beep(660, 0, .15); },
+    go() { beep(990, 0, .3); },
+    end() { beep(660, 0, .2); beep(520, .18, .2); beep(392, .36, .45); }
+  };
+  const buzz = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch {} };
+
+  // ---------- Screens ----------
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+  }
+
+  // ---------- Home ----------
+  function renderPlayers() {
+    const box = $('players');
+    box.innerHTML = '';
+    players.forEach(name => {
+      const s = scores[name] || { total: 0, rounds: 0 };
+      const b = document.createElement('button');
+      b.className = 'player' + (name === current ? ' selected' : '');
+      b.innerHTML = `<div class="name"></div><div class="stats">${s.rounds} rounds · ${s.total} points</div>`;
+      b.querySelector('.name').textContent = name;
+      b.onclick = () => { current = name; store.set('current', current); renderPlayers(); };
+      box.appendChild(b);
+    });
+    const add = document.createElement('button');
+    add.className = 'player add';
+    add.textContent = '+';
+    add.setAttribute('aria-label', 'Add player');
+    add.onclick = () => {
+      const name = (prompt('Player name?') || '').trim().slice(0, 16);
+      if (!name || players.includes(name)) return;
+      players.push(name); current = name;
+      store.set('players', players); store.set('current', current);
+      renderPlayers();
+    };
+    box.appendChild(add);
+  }
+
+  function renderCats() {
+    const box = $('cats');
+    box.innerHTML = '';
+    Object.entries(window.CATEGORIES).forEach(([name, cat]) => {
+      const b = document.createElement('button');
+      b.className = 'cat';
+      b.innerHTML = `<span class="icon">${cat.icon}</span><span class="label"></span><span class="count">${cat.words.length} words</span>`;
+      b.querySelector('.label').textContent = name;
+      b.onclick = () => startRound(name);
+      box.appendChild(b);
+    });
+  }
+
+  function renderSettings() {
+    $('timeBtn').textContent = `⏱️ ${roundTime} sec`;
+    $('soundBtn').textContent = soundOn ? '🔊 Sound on' : '🔇 Sound off';
+    $('soundBtn').classList.toggle('on', soundOn);
+  }
+  $('timeBtn').onclick = () => {
+    roundTime = TIMES[(TIMES.indexOf(roundTime) + 1) % TIMES.length];
+    store.set('time', roundTime); renderSettings();
+  };
+  $('soundBtn').onclick = () => { soundOn = !soundOn; store.set('sound', soundOn); unlockAudio(); renderSettings(); };
+  $('resetBtn').onclick = () => {
+    if (!confirm('Reset all scores?')) return;
+    scores = {}; store.set('scores', scores); renderPlayers();
+  };
+
+  // ---------- Tilt (motion sensor) ----------
+  // We read gravity along the axis coming out of the screen (z). Upright on a
+  // forehead that is ~0; screen facing the floor or the ceiling pushes it to ±9.8.
+  // Browsers disagree on the sign, so we learn which sign means "face up"
+  // while the phone is lying back in someone's hand on the home screen.
+  let motionOK = false, z = 0, upSign = store.get('upSign', 1);
+  let beta = null, gamma = null;
+  const needsPermission = typeof DeviceMotionEvent !== 'undefined' &&
+                          typeof DeviceMotionEvent.requestPermission === 'function';
+
+  function listen() {
+    window.addEventListener('devicemotion', e => {
+      const g = e.accelerationIncludingGravity;
+      if (!g || g.z == null) return;
+      motionOK = true; z = g.z;
+      if (beta != null && Math.abs(beta) < 60 && Math.abs(gamma) < 60 && Math.abs(z) > 5) {
+        const s = Math.sign(z);
+        if (s !== upSign) { upSign = s; store.set('upSign', upSign); }
+      }
+      onTilt();
+    });
+    window.addEventListener('deviceorientation', e => { beta = e.beta; gamma = e.gamma; });
+  }
+
+  async function askMotion() {
+    if (!needsPermission) return true;
+    try {
+      const ok = (await DeviceMotionEvent.requestPermission()) === 'granted';
+      if (ok) { try { await DeviceOrientationEvent.requestPermission(); } catch {} }
+      $('tiltBtn').hidden = ok;
+      return ok;
+    } catch { return false; }
+  }
+  if (needsPermission) {
+    $('tiltBtn').hidden = false;
+    $('tiltBtn').onclick = async () => { unlockAudio(); await askMotion(); };
+  }
+  listen();
+
+  // ---------- Round ----------
+  let round = null;     // { cat, words, results, left, timer, busy, armed, streak }
+  let wakeLock = null;
+
+  function nextFromDeck(cat) {
+    let deck = decks[cat];
+    const all = window.CATEGORIES[cat].words;
+    deck = (deck || []).filter(w => all.includes(w));
+    if (!deck.length) {
+      deck = all.slice();
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+    }
+    const word = deck.pop();
+    decks[cat] = deck;
+    return word;
+  }
+
+  async function startRound(cat) {
+    unlockAudio();
+    await askMotion();
+    try { wakeLock = await navigator.wakeLock?.request('screen'); } catch {}
+    try {
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen();
+        await screen.orientation?.lock?.('landscape');
+      }
+    } catch {}
+
+    round = { cat, results: [], left: roundTime, busy: true, armed: false, streak: 0, word: '' };
+    $('readyHint').textContent = motionOK || needsPermission
+      ? 'Hold it sideways with the screen facing your friends.'
+      : 'No tilt sensor found. Friends tap right for correct, left to pass.';
+    show('ready');
+    setTimeout(() => countdown(3), 1800);
+  }
+
+  function countdown(n) {
+    if (!round) return;
+    if (n === 0) { sfx.go(); buzz(150); return play(); }
+    show('countdown');
+    $('countNum').textContent = n;
+    sfx.count();
+    setTimeout(() => countdown(n - 1), 900);
+  }
+
+  function play() {
+    $('playCat').textContent = round.cat;
+    $('liveScore').textContent = '0';
+    showTime();
+    show('play');
+    newWord();
+    round.timer = setInterval(() => {
+      round.left--;
+      showTime();
+      if (round.left <= 5 && round.left > 0) sfx.tick();
+      if (round.left <= 0) endRound();
+    }, 1000);
+  }
+
+  function showTime() {
+    const t = $('timer');
+    t.textContent = round.left;
+    t.classList.toggle('low', round.left <= 10);
+  }
+
+  function newWord() {
+    round.word = nextFromDeck(round.cat);
+    $('play').className = 'screen active';
+    setWord(round.word);
+    round.busy = false;
+    round.armed = Math.abs(z) < TILT_OFF || !motionOK;
+    round.streak = 0;
+  }
+
+  function setWord(text) {
+    const el = $('word');
+    el.textContent = text;
+    // Biggest size that still fits on one line.
+    const box = el.parentElement;
+    let size = Math.min(box.clientHeight * 0.55, 220);
+    el.style.fontSize = size + 'px';
+    while (size > 18 && el.scrollWidth > box.clientWidth * 0.94) {
+      size -= 4;
+      el.style.fontSize = size + 'px';
+    }
+  }
+
+  function answer(correct) {
+    if (!round || round.busy) return;
+    round.busy = true;
+    round.results.push({ word: round.word, correct });
+    round.word = '';
+    const score = round.results.filter(r => r.correct).length;
+    $('liveScore').textContent = score;
+    $('play').className = 'screen active ' + (correct ? 'good' : 'skip');
+    setWord(correct ? 'Correct!' : 'Pass');
+    correct ? sfx.good() : sfx.pass();
+    buzz(correct ? 80 : [40, 40, 40]);
+    setTimeout(() => { if (round && round.left > 0) newWord(); }, 800);
+  }
+
+  function onTilt() {
+    if (!round || !$('play').classList.contains('active')) return;
+    const up = z * upSign;              // + = screen toward ceiling, - = toward floor
+    if (!round.armed) {
+      if (Math.abs(z) < TILT_OFF) round.armed = true;
+      return;
+    }
+    if (round.busy) return;
+    if (Math.abs(up) > TILT_ON) {
+      if (++round.streak >= 3) { round.armed = false; answer(up < 0); }
+    } else {
+      round.streak = 0;
+    }
+  }
+
+  $('tapGood').onclick = () => { unlockAudio(); answer(true); };
+  $('tapPass').onclick = () => { unlockAudio(); answer(false); };
+
+  function endRound() {
+    clearInterval(round.timer);
+    round.busy = true;
+    // The word on screen when time ran out counts as a pass.
+    if (round.word) round.results.push({ word: round.word, correct: false });
+    store.set('decks', decks);
+    sfx.end(); buzz([200, 100, 400]);
+    show('timesup');
+    setTimeout(showResults, 1600);
+  }
+
+  function showResults() {
+    const r = round;
+    const score = r.results.filter(x => x.correct).length;
+    const s = scores[current] || { total: 0, rounds: 0, best: {} };
+    s.best = s.best || {};
+    const prevBest = s.best[r.cat] || 0;
+    s.total += score; s.rounds += 1;
+    if (score > prevBest) s.best[r.cat] = score;
+    scores[current] = s; store.set('scores', scores);
+
+    $('resPlayer').textContent = `${current} · ${r.cat}`;
+    $('resScore').textContent = score;
+    $('resSub').textContent = score === 1 ? 'word guessed' : 'words guessed';
+    $('resBest').innerHTML = score > prevBest && score > 0
+      ? '<span class="best">🏆 New best!</span>'
+      : `<span style="opacity:.8">Best in ${r.cat}: ${Math.max(prevBest, score)}</span>`;
+    const list = $('resList');
+    list.innerHTML = '';
+    r.results.forEach(x => {
+      const li = document.createElement('li');
+      li.className = x.correct ? 'ok' : 'no';
+      li.textContent = (x.correct ? '✅ ' : '⏭️ ') + x.word;
+      list.appendChild(li);
+    });
+    const next = players[(players.indexOf(current) + 1) % players.length];
+    $('nextBtn').textContent = `${next}'s turn`;
+    $('nextBtn').hidden = next === current;
+    $('nextBtn').onclick = () => { current = next; store.set('current', current); startRound(r.cat); };
+    $('againBtn').onclick = () => startRound(r.cat);
+    show('results');
+    releaseScreen();
+  }
+
+  function releaseScreen() {
+    try { wakeLock?.release(); } catch {}
+    wakeLock = null;
+    try { screen.orientation?.unlock?.(); } catch {}
+    try { document.fullscreenElement && document.exitFullscreen(); } catch {}
+  }
+
+  $('homeBtn').onclick = () => { round = null; renderPlayers(); show('home'); };
+
+  window.addEventListener('resize', () => { if (round && $('play').classList.contains('active')) setWord($('word').textContent); });
+
+  renderPlayers();
+  renderCats();
+  renderSettings();
+})();
+</script>
+</body>
+</html>
