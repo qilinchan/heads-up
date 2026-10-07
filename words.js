@@ -216,6 +216,108 @@ window.CATEGORIES = {
       "Ferry", "Pirate Ship", "Spaceship", "UFO", "Tank", "Camper Van",
       "Rickshaw", "Segway"
     ]
+  },
+  "Sound It Out": {
+    icon: "🔊",
+    words: [
+      "Dog Barking", "Cat Meowing", "Cow", "Rooster", "Duck", "Sheep", "Pig",
+      "Horse", "Lion Roar", "Monkey", "Owl", "Snake", "Frog", "Elephant",
+      "Wolf Howling", "Bee Buzzing", "Mosquito", "Seal", "Dinosaur",
+      "Fire Truck Siren", "Police Siren", "Ambulance", "Train", "Car Horn",
+      "Motorcycle", "Airplane Taking Off", "Helicopter", "Rocket Launch",
+      "Doorbell", "Alarm Clock", "Phone Ringing", "Microwave Beep",
+      "Popcorn Popping", "Sizzling Bacon", "Kettle Whistling", "Vacuum Cleaner",
+      "Toilet Flushing", "Blender", "Thunder", "Rain on the Roof", "Wind Howling",
+      "Ocean Waves", "Snoring", "Sneezing", "Hiccups", "Burp", "Slurping Soup",
+      "Crunchy Chips", "Ghost", "Robot", "Laser Beam", "Video Game Coin",
+      "Balloon Popping", "Drum Roll", "Clock Ticking", "Squeaky Door",
+      "Baby Crying", "Evil Laugh"
+    ]
+  },
+  "Minnesota": {
+    icon: "🌲",
+    words: [
+      "Minneapolis", "St. Paul", "Twin Cities", "Duluth", "Rochester",
+      "Stillwater", "Lake Superior", "Mississippi River", "Lake Minnetonka",
+      "Lake Itasca", "Boundary Waters", "Land of 10,000 Lakes", "Loon",
+      "Mosquito", "Walleye", "Wild Rice", "Hotdish", "Juicy Lucy",
+      "Cheese Curds", "Pronto Pup", "Sweet Martha's Cookies", "Bars",
+      "State Fair", "Butter Sculpture", "Mall of America",
+      "Nickelodeon Universe", "Valleyfair", "Minnesota Zoo", "Como Zoo",
+      "Science Museum", "Spoonbridge and Cherry", "Stone Arch Bridge",
+      "Minnehaha Falls", "Split Rock Lighthouse", "Gooseberry Falls",
+      "Paul Bunyan", "Babe the Blue Ox", "Ice Fishing", "Ice Castle",
+      "Winter Carnival", "Snow Day", "Snowplow", "Polar Plunge", "Sledding",
+      "Cabin Up North", "Canoe", "Minnesota Nice", "Uff Da", "Twins", "Vikings",
+      "Timberwolves", "Wild", "Lynx", "Gophers", "Target", "Northern Lights"
+    ]
+  },
+  "China": {
+    icon: "🐉",
+    words: [
+      "Beijing", "Shanghai", "Hong Kong", "Great Wall", "Forbidden City",
+      "Terracotta Warriors", "Giant Panda", "Yangtze River", "Yellow River",
+      "Guilin Mountains", "West Lake", "Pearl Tower", "Chinese New Year",
+      "Mid-Autumn Festival", "Dragon Boat Festival", "Lantern Festival",
+      "Red Envelope", "Firecrackers", "Lion Dance", "Dragon Dance", "Mooncake",
+      "Zongzi", "Tangyuan", "Jiaozi", "Baozi", "Xiaolongbao", "Peking Duck",
+      "Hot Pot", "Congee", "Fried Rice", "Chow Mein", "Tea", "Chopsticks",
+      "Kung Fu", "Tai Chi", "Calligraphy", "Ink Painting", "Paper Cutting",
+      "Kite Flying", "Shadow Puppets", "Abacus", "Jade", "Silk", "Qipao",
+      "Monkey King", "Mulan", "Chang'e", "Jade Rabbit", "Zodiac Animals",
+      "Ni Hao", "Xie Xie", "Mandarin", "Pinyin", "Erhu", "Guzheng", "Mahjong"
+    ]
+  },
+  "Sing It Out": {
+    icon: "🎤",
+    words: [
+      "Happy Birthday", "Twinkle Twinkle Little Star", "Baby Shark",
+      "Let It Go", "Build a Snowman", "How Far I'll Go",
+      "We Don't Talk About Bruno", "Under the Sea", "Hakuna Matata",
+      "Circle of Life", "A Whole New World", "You've Got a Friend in Me",
+      "Remember Me", "Golden", "Shake It Off", "Happy", "YMCA",
+      "Old MacDonald", "Wheels on the Bus", "Row Row Row Your Boat",
+      "Itsy Bitsy Spider", "If You're Happy and You Know It",
+      "Head Shoulders Knees and Toes", "Hokey Pokey", "BINGO", "ABC Song",
+      "Mary Had a Little Lamb", "London Bridge", "Ring Around the Rosie",
+      "Five Little Monkeys", "The Ants Go Marching", "Hot Cross Buns",
+      "Yankee Doodle", "Pop Goes the Weasel", "Frère Jacques", "Two Tigers",
+      "Jasmine Flower", "Do-Re-Mi", "Supercalifragilistic", "You Are My Sunshine",
+      "Over the Rainbow", "Take Me Out to the Ball Game", "Jingle Bells",
+      "Rudolph the Reindeer", "Frosty the Snowman", "Deck the Halls",
+      "We Wish You a Merry Christmas", "Star-Spangled Banner",
+      "This Little Light of Mine", "Rain Rain Go Away"
+    ]
+  },
+  // Pieces from Suzuki Cello School, Volumes 1 and 2.
+  "Play It Out: Suzuki Cello 1 & 2": {
+    icon: "🎻",
+    words: [
+      "Twinkle Variations", "French Folk Song", "Lightly Row", "Song of the Wind",
+      "Go Tell Aunt Rhody", "O Come, Little Children", "May Song",
+      "Allegro", "Perpetual Motion in D", "Perpetual Motion in G",
+      "Long, Long Ago", "Allegretto", "Andantino", "Rigadoon", "Etude",
+      "The Happy Farmer", "Minuet in C (Bach)", "Minuet No. 2 (Bach)",
+      "May Time (Mozart)", "Minuet No. 1 (Bach)", "Minuet No. 3 (Bach)",
+      "Chorus from Judas Maccabaeus", "Hunters' Chorus", "Musette",
+      "March in G (Bach)", "Witches' Dance", "Moon over the Ruined Castle",
+      "The Two Grenadiers", "Gavotte (Gossec)", "Bourrée (Handel)"
+    ]
+  },
+  // Pieces from Suzuki Violin School, Volumes 1 and 2.
+  "Play It Out: Suzuki Violin 1 & 2": {
+    icon: "🎻",
+    words: [
+      "Twinkle Variations", "Lightly Row", "Song of the Wind",
+      "Go Tell Aunt Rhody", "O Come, Little Children", "May Song",
+      "Long, Long Ago", "Allegro", "Perpetual Motion", "Allegretto",
+      "Andantino", "Etude", "Minuet No. 1 (Bach)", "Minuet No. 2 (Bach)",
+      "Minuet No. 3 (Bach)", "The Happy Farmer", "Gavotte (Gossec)",
+      "Chorus from Judas Maccabaeus", "Musette", "Hunters' Chorus",
+      "Long, Long Ago (Variation)", "Waltz (Brahms)", "Bourrée (Handel)",
+      "The Two Grenadiers", "Witches' Dance", "Gavotte from Mignon",
+      "Gavotte (Lully)", "Minuet in G (Beethoven)", "Minuet (Boccherini)"
+    ]
   }
 };
 
